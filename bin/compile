@@ -1,38 +1,36 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
+set -o pipefail
 
-BUILD_DIR=$1
-CACHE_DIR=$2
+BUILD_DIR=${1:-}
+CACHE_DIR=${2:-}
+INSTALL_DIR="$BUILD_DIR/vendor/libopaque"
 
-echo "-----> Installing libopaque"
+echo "-----> Installing libsodium-dev and pkgconf"
+apt-get update -y
+apt-get install -y libsodium-dev pkgconf
 
-LIBOPAQUE_GIT_REPO="https://github.com/stef/libopaque.git"
+echo "-----> Fetching libopaque from GitHub"
+LIBOPAQUE_REPO="https://github.com/stef/libopaque.git"
+git clone $LIBOPAQUE_REPO $CACHE_DIR/libopaque
 
-# Clone the repository
-if [ ! -d "${CACHE_DIR}/libopaque" ]; then
-  git clone "${LIBOPAQUE_GIT_REPO}" "${CACHE_DIR}/libopaque"
-fi
+cd $CACHE_DIR/libopaque
 
-# Update the repository to the latest version and init submodules
-cd "${CACHE_DIR}/libopaque"
-git fetch origin
-git reset --hard origin/master
+echo "-----> Building libopaque"
 git submodule update --init --recursive --remote
-
-# Compile the library
 cd src
 make
 
-# Copy the compiled library and headers to the vendor folder
-mkdir -p "${BUILD_DIR}/.heroku/vendor/lib"
-mkdir -p "${BUILD_DIR}/.heroku/vendor/include"
-cp *.a "${BUILD_DIR}/.heroku/vendor/lib"
-cp *.h "${BUILD_DIR}/.heroku/vendor/include"
+echo "-----> Installing libopaque"
+mkdir -p $INSTALL_DIR/lib
+mkdir -p $INSTALL_DIR/include
+cp *.a $INSTALL_DIR/lib/
+cp *.h $INSTALL_DIR/include/
 
-# Set the necessary environment variables
-export LDFLAGS="-L${BUILD_DIR}/.heroku/vendor/lib ${LDFLAGS}"
-export CPPFLAGS="-I${BUILD_DIR}/.heroku/vendor/include ${CPPFLAGS}"
-export LD_LIBRARY_PATH="${BUILD_DIR}/.heroku/vendor/lib:${LD_LIBRARY_PATH}"
-
-echo "-----> libopaque installed"
+echo "-----> Exporting environment variables"
+cat << EOF > $BUILD_DIR/.profile.d/libopaque.sh
+export LD_LIBRARY_PATH="$INSTALL_DIR/lib:\$LD_LIBRARY_PATH"
+export LIBRARY_PATH="$INSTALL_DIR/lib:\$LIBRARY_PATH"
+export CPATH="$INSTALL_DIR/include:\$CPATH"
+EOF
