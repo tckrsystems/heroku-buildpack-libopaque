@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-echo "libsodium"
+echo "libopaque"
 exit 0
