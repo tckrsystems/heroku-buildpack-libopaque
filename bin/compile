@@ -5,10 +5,6 @@ set -e
 BUILD_DIR=$1
 CACHE_DIR=$2
 
-echo "-----> Installing libsodium-dev and pkgconf"
-apt-get update
-apt-get install -y libsodium-dev pkgconf
-
 echo "-----> Installing libopaque"
 
 LIBOPAQUE_GIT_REPO="https://github.com/stef/libopaque.git"
