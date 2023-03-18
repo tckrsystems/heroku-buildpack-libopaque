@@ -7,10 +7,6 @@ BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 INSTALL_DIR="$BUILD_DIR/vendor/libopaque"
 
-echo "-----> Installing libsodium-dev and pkgconf"
-apt-get update -y
-apt-get install -y libsodium-dev pkgconf
-
 echo "-----> Fetching libopaque from GitHub"
 LIBOPAQUE_REPO="https://github.com/stef/libopaque.git"
 git clone $LIBOPAQUE_REPO $CACHE_DIR/libopaque
