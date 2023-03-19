@@ -11,8 +11,7 @@ cd $BUILD_DIR
 
 # Clone and build libopaque
 git clone https://github.com/stef/libopaque.git
-cd libopaque
-git checkout "v${LIBOPAQUE_VERSION}"
+cd libopaque/src
 make
 
 # Create the libopaque vendor directory
