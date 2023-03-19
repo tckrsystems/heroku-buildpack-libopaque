@@ -1,32 +1,33 @@
-#!/bin/bash
+#!/bin/sh
 
-set -e
-set -o pipefail
+BUILD_DIR=$1
+CACHE_DIR=$2
 
-BUILD_DIR=${1:-}
-CACHE_DIR=${2:-}
-INSTALL_DIR="$BUILD_DIR/vendor/libopaque"
-
-echo "-----> Fetching libopaque from GitHub"
-LIBOPAQUE_REPO="https://github.com/stef/libopaque.git"
-git clone $LIBOPAQUE_REPO $CACHE_DIR/libopaque
-
-cd $CACHE_DIR/libopaque
-
-echo "-----> Building libopaque"
-git submodule update --init --recursive --remote
-cd src
-make
+LIBOPAQUE_VERSION="0.1.0"  # Replace this with the desired version
 
 echo "-----> Installing libopaque"
-mkdir -p $INSTALL_DIR/lib
-mkdir -p $INSTALL_DIR/include
-cp *.a $INSTALL_DIR/lib/
-cp *.h $INSTALL_DIR/include/
 
-echo "-----> Exporting environment variables"
-cat << EOF > $BUILD_DIR/.profile.d/libopaque.sh
-export LD_LIBRARY_PATH="$INSTALL_DIR/lib:\$LD_LIBRARY_PATH"
-export LIBRARY_PATH="$INSTALL_DIR/lib:\$LIBRARY_PATH"
-export CPATH="$INSTALL_DIR/include:\$CPATH"
-EOF
+cd $BUILD_DIR
+
+# Clone and build libopaque
+git clone https://github.com/stef/libsodium_opaque.git
+cd libsodium_opaque
+git checkout "v${LIBOPAQUE_VERSION}"
+make
+
+# Create the libopaque vendor directory
+LIBOPAQUE_VENDOR_DIR="$BUILD_DIR/vendor/libopaque"
+mkdir -p $LIBOPAQUE_VENDOR_DIR/lib
+mkdir -p $LIBOPAQUE_VENDOR_DIR/include
+
+# Copy the compiled library and header files to the vendor directory
+cp opaque.h $LIBOPAQUE_VENDOR_DIR/include/
+cp libopaque.a $LIBOPAQUE_VENDOR_DIR/lib/
+
+# Export the environment variables
+echo "export LIBOPAQUE_DIR=\"$LIBOPAQUE_VENDOR_DIR\"" >> $BUILD_DIR/.profile.d/libopaque.sh
+echo "export C_INCLUDE_PATH=\"\$C_INCLUDE_PATH:\$LIBOPAQUE_DIR/include\"" >> $BUILD_DIR/.profile.d/libopaque.sh
+echo "export LIBRARY_PATH=\"\$LIBRARY_PATH:\$LIBOPAQUE_DIR/lib\"" >> $BUILD_DIR/.profile.d/libopaque.sh
+echo "export LD_LIBRARY_PATH=\"\$LD_LIBRARY_PATH:\$LIBOPAQUE_DIR/lib\"" >> $BUILD_DIR/.profile.d/libopaque.sh
+
+echo "-----> libopaque installed"

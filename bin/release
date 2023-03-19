@@ -1,9 +1,0 @@
-#!/bin/sh
-
-cat << EOF
-export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:/app/.heroku/vendor/lib"
-export LIBRARY_PATH="\$LIBRARY_PATH:/app/.heroku/vendor/lib"
-export PKG_CONFIG_PATH="\$PKG_CONFIG_PATH:/app/.heroku/vendor/lib/pkgconfig"
-export CPPPATH="\$CPPPATH:/app/.heroku/vendor/include"
-export CPATH="\$CPATH:/app/.heroku/vendor/include"
-EOF
