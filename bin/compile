@@ -72,9 +72,9 @@ export LIBRARY_PATH="$INSTALL_DIR/lib:$LIBRARY_PATH"
 echo "done"
 
 #echo -n "-----> Configuring Ruby binding... "
-#cd $CACHE_DIR/libopaque-master
-#cp ruby $BUILD_DIR/lib/libopaque
-#cd $BUILD_DIR/lib/libopaque
+cd $CACHE_DIR/libopaque
+cp ruby $BUILD_DIR/lib/libopaque
+cd $BUILD_DIR/lib/libopaque
 #ruby extconf.rb
 #make CFLAGS="-Wall -I/app/vendor/libopaque/libopaque/src -fPIC"
 #make
