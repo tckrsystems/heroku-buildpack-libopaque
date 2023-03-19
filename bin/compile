@@ -101,7 +101,7 @@ echo "done"
 
 echo -n "-----> Cleaning up $OPAQUE_DIR... "
 cd $CACHE_DIR
-rm -r libopaque-master
+rm -r $OPAQUE_DIR
 echo "done"
 
 #export LIBRARY_PATH=$LIBRARY_PATH:/app/vendor/libopaque/libopaque/src
