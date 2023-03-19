@@ -9,7 +9,7 @@ echo "-----> Installing libopaque"
 
 cd $BUILD_DIR
 
-LIBOPAQUE_VENDOR_DIR="~/vendor/libopaque"
+LIBOPAQUE_VENDOR_DIR="$BUILD_DIR/vendor/libopaque"
 mkdir -p $LIBOPAQUE_VENDOR_DIR
 
 cd $LIBOPAQUE_VENDOR_DIR
