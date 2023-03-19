@@ -46,7 +46,7 @@ git clone https://github.com/stef/libopaque.git
 echo "done"
 
 echo -n "-----> Update submodule $OPAQUE_DIR... "
-cd libopaque-master
+cd $OPAQUE_DIR
 git submodule update --init --recursive --remote
 echo "done"
 
