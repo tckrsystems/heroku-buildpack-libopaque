@@ -10,8 +10,8 @@ echo "-----> Installing libopaque"
 cd $BUILD_DIR
 
 # Clone and build libopaque
-git clone https://github.com/stef/libsodium_opaque.git
-cd libsodium_opaque
+git clone https://github.com/stef/libopaque.git
+cd libopaque
 git checkout "v${LIBOPAQUE_VERSION}"
 make
 
