@@ -58,12 +58,12 @@ echo "done"
 echo -n "-----> Installing $OPAQUE_DIR... "
 mkdir -p $LIBOPAQUE_VENDOR_DIR/bin
 mkdir -p $LIBOPAQUE_VENDOR_DIR/lib
-mkdir -p $LIBOPAQUE_VENDOR_DIR/include
+#mkdir -p $LIBOPAQUE_VENDOR_DIR/include
 
 cp opaque.o $LIBOPAQUE_VENDOR_DIR/bin
 cp libopaque.a $LIBOPAQUE_VENDOR_DIR/lib
 cp libopaque.so $LIBOPAQUE_VENDOR_DIR/lib
-cp opaque.h $LIBOPAQUE_VENDOR_DIR/include
+#cp opaque.h $LIBOPAQUE_VENDOR_DIR/include
 echo "done"
 
 echo -n "-----> Configuring build environment... "
