@@ -1,42 +1,113 @@
-#!/bin/sh
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir> <env-dir>
 
-BUILD_DIR=$1
-CACHE_DIR=$2
+### Configure Environment
 
-LIBOPAQUE_VERSION="0.1.0"  # Replace this with the desired version
+set -eo pipefail
 
-echo "-----> Installing libopaque"
+### Constants
 
-cd $BUILD_DIR
+OPAQUE_DIR=libopaque
+TARBALL=$SODIUM_DIR.tar.gz
+TARBALL_URL=https://github.com/stef/libopaque/archive/refs/heads/master.zip
 
-LIBOPAQUE_VENDOR_DIR="$BUILD_DIR/vendor/libopaque"
-mkdir -p $LIBOPAQUE_VENDOR_DIR
+### Paths
 
-cd $LIBOPAQUE_VENDOR_DIR
+BASE_DIR=$PWD # absolute path
+BUILD_DIR=${1:-}
+CACHE_DIR=${2:-}
+ENV_DIR=${3:-}
+INSTALL_DIR="$BUILD_DIR/vendor/libopaque"
 
-# Clone and build libopaque
+mkdir -p $CACHE_DIR
+mkdir -p $INSTALL_DIR
+
+export_env_dir() {
+  local env_dir=$1
+  if [ -d "$env_dir" ]; then
+    local whitelist_regex=${2:-''}
+    local blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
+    if [ -d "$env_dir" ]; then
+      for e in $(ls $env_dir); do
+        echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
+        export "$e=$(cat $env_dir/$e)"
+        :
+      done
+    fi
+  fi
+}
+export_env_dir "$ENV_DIR"
+
+### Compile
+
+cd $CACHE_DIR
+echo -n "-----> Fetching $OPAQUE_DIR... "
 git clone https://github.com/stef/libopaque.git
-cd libopaque
+echo "done"
+
+echo -n "-----> Update submodule $OPAQUE_DIR... "
+cd libopaque-master
 git submodule update --init --recursive --remote
+echo "done"
+
+echo -n "-----> Compile $OPAQUE_DIR... "
 cd src
 make
+echo "done"
 
-# Create the libopaque vendor directory
+echo -n "-----> Installing $OPAQUE_DIR... "
 mkdir -p $LIBOPAQUE_VENDOR_DIR/bin
 mkdir -p $LIBOPAQUE_VENDOR_DIR/lib
 mkdir -p $LIBOPAQUE_VENDOR_DIR/include
 
-# Copy the compiled library and header files to the vendor directory
 cp opaque.o $LIBOPAQUE_VENDOR_DIR/bin
 cp libopaque.a $LIBOPAQUE_VENDOR_DIR/lib
 cp libopaque.so $LIBOPAQUE_VENDOR_DIR/lib
 cp opaque.h $LIBOPAQUE_VENDOR_DIR/include
+echo "done"
 
-# Export the environment variables
-echo "export LIBOPAQUE_DIR=\"$LIBOPAQUE_VENDOR_DIR\"" >> $BUILD_DIR/.profile.d/libopaque.sh
-echo "export C_INCLUDE_PATH=\"\$C_INCLUDE_PATH:\$LIBOPAQUE_DIR/include\"" >> $BUILD_DIR/.profile.d/libopaque.sh
-echo "export LIBRARY_PATH=\"\$LIBRARY_PATH:\$LIBOPAQUE_DIR/lib\"" >> $BUILD_DIR/.profile.d/libopaque.sh
-echo "export LD_LIBRARY_PATH=\"\$LD_LIBRARY_PATH:\$LIBOPAQUE_DIR/lib\"" >> $BUILD_DIR/.profile.d/libopaque.sh
+echo -n "-----> Configuring build environment... "
+export LD_LIBRARY_PATH="$INSTALL_DIR/lib:$LD_LIBRARY_PATH"
+export LIBRARY_PATH="$INSTALL_DIR/lib:$LIBRARY_PATH"
+echo "done"
+
+#echo -n "-----> Configuring Ruby binding... "
+#cd $CACHE_DIR/libopaque-master
+#cp ruby $BUILD_DIR/lib/libopaque
+#cd $BUILD_DIR/lib/libopaque
+#ruby extconf.rb
+#make CFLAGS="-Wall -I/app/vendor/libopaque/libopaque/src -fPIC"
+#make
+
+
+cd $BASE_DIR
+
+cat <<EOF > export
+export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:$LD_LIBRARY_PATH"
+export LIBRARY_PATH="\$LIBRARY_PATH:$LIBRARY_PATH"
+EOF
+
+echo "done"
+
+echo -n "-----> Building runtime environment... "
+mkdir -p $BUILD_DIR/.profile.d
+
+cat <<EOF > $BUILD_DIR/.profile.d/libopaque.sh
+export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:${LD_LIBRARY_PATH//$BUILD_DIR//app}"
+export LIBRARY_PATH="\$LIBRARY_PATH:${LIBRARY_PATH//$BUILD_DIR//app}"
+EOF
+
+echo "done"
+
+echo -n "-----> Cleaning up $OPAQUE_DIR... "
+cd $CACHE_DIR
+rm -r libopaque-master
+echo "done"
+
+#export LIBRARY_PATH=$LIBRARY_PATH:/app/vendor/libopaque/libopaque/src
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/vendor/libopaque/libopaque/src
+#ruby extconf.rb
+#make CFLAGS="-Wall -I/app/vendor/libopaque/libopaque/src -fPIC"
 
 echo "-----> libopaque installed"
 
