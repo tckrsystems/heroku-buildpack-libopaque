@@ -9,6 +9,11 @@ echo "-----> Installing libopaque"
 
 cd $BUILD_DIR
 
+LIBOPAQUE_VENDOR_DIR="~/vendor/libopaque"
+mkdir -p $LIBOPAQUE_VENDOR_DIR
+
+cd $LIBOPAQUE_VENDOR_DIR
+
 # Clone and build libopaque
 git clone https://github.com/stef/libopaque.git
 cd libopaque
@@ -17,13 +22,15 @@ cd src
 make
 
 # Create the libopaque vendor directory
-LIBOPAQUE_VENDOR_DIR="$BUILD_DIR/vendor/libopaque"
+mkdir -p $LIBOPAQUE_VENDOR_DIR/bin
 mkdir -p $LIBOPAQUE_VENDOR_DIR/lib
 mkdir -p $LIBOPAQUE_VENDOR_DIR/include
 
 # Copy the compiled library and header files to the vendor directory
-cp opaque.h $LIBOPAQUE_VENDOR_DIR/include/
-cp libopaque.a $LIBOPAQUE_VENDOR_DIR/lib/
+cp opaque.o $LIBOPAQUE_VENDOR_DIR/bin
+cp libopaque.a $LIBOPAQUE_VENDOR_DIR/lib
+cp libopaque.so $LIBOPAQUE_VENDOR_DIR/lib
+cp opaque.h $LIBOPAQUE_VENDOR_DIR/include
 
 # Export the environment variables
 echo "export LIBOPAQUE_DIR=\"$LIBOPAQUE_VENDOR_DIR\"" >> $BUILD_DIR/.profile.d/libopaque.sh
@@ -32,3 +39,4 @@ echo "export LIBRARY_PATH=\"\$LIBRARY_PATH:\$LIBOPAQUE_DIR/lib\"" >> $BUILD_DIR/
 echo "export LD_LIBRARY_PATH=\"\$LD_LIBRARY_PATH:\$LIBOPAQUE_DIR/lib\"" >> $BUILD_DIR/.profile.d/libopaque.sh
 
 echo "-----> libopaque installed"
+
