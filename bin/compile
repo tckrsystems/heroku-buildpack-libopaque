@@ -76,8 +76,8 @@ echo "done"
 #echo -n "-----> Configuring Ruby binding... "
 cp -r ../ruby $BUILD_DIR/lib/libopaque
 cd $BUILD_DIR/lib/libopaque
-#ruby extconf.rb
-#make
+ruby extconf.rb
+make CFLAGS="-fPIC"
 
 cd $BASE_DIR
 
