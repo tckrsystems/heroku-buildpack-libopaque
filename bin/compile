@@ -69,21 +69,23 @@ echo "done"
 echo -n "-----> Configuring build environment... "
 export LD_LIBRARY_PATH="$INSTALL_DIR/lib:$LD_LIBRARY_PATH"
 export LIBRARY_PATH="$INSTALL_DIR/lib:$LIBRARY_PATH"
+export CPPPATH="$INSTALL_DIR/include:$CPPPATH"
+export CPATH="$INSTALL_DIR/include:$CPATH"
 echo "done"
 
 #echo -n "-----> Configuring Ruby binding... "
 cp -r ../ruby $BUILD_DIR/lib/libopaque
 cd $BUILD_DIR/lib/libopaque
-#ruby extconf.rb
-#make CFLAGS="-Wall -I/app/vendor/libopaque/libopaque/src -fPIC"
-#make
-
+ruby extconf.rb
+make
 
 cd $BASE_DIR
 
 cat <<EOF > export
 export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:$LD_LIBRARY_PATH"
 export LIBRARY_PATH="\$LIBRARY_PATH:$LIBRARY_PATH"
+export CPPPATH="\$CPPPATH:$CPPPATH"
+export CPATH="\$CPATH:$CPATH"
 EOF
 
 echo "done"
@@ -94,6 +96,8 @@ mkdir -p $BUILD_DIR/.profile.d
 cat <<EOF > $BUILD_DIR/.profile.d/libopaque.sh
 export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:${LD_LIBRARY_PATH//$BUILD_DIR//app}"
 export LIBRARY_PATH="\$LIBRARY_PATH:${LIBRARY_PATH//$BUILD_DIR//app}"
+export CPPPATH="\$CPPPATH:${CPPPATH//$BUILD_DIR//app}"
+export CPATH="\$CPATH:${CPATH//$BUILD_DIR//app}"
 EOF
 
 echo "done"
@@ -102,11 +106,6 @@ echo -n "-----> Cleaning up $OPAQUE_DIR... "
 cd $CACHE_DIR
 rm -r $OPAQUE_DIR
 echo "done"
-
-#export LIBRARY_PATH=$LIBRARY_PATH:/app/vendor/libopaque/libopaque/src
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/vendor/libopaque/libopaque/src
-#ruby extconf.rb
-#make CFLAGS="-Wall -I/app/vendor/libopaque/libopaque/src -fPIC"
 
 echo "-----> libopaque installed"
 
