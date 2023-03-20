@@ -73,7 +73,8 @@ git submodule update --init --recursive --remote
 echo "done"
 
 echo -n "-----> Copy Ruby directory to lib... "
-cp -p /ruby $LIB_DIR
+ls
+cp -p ruby $LIB_DIR
 
 echo -n "-----> Compile $LIB_NAME... "
 cd src
