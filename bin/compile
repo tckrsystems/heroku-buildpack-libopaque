@@ -70,8 +70,6 @@ git submodule update --init --recursive --remote
 echo "done"
 
 echo -n "-----> Copy Ruby directory to lib... "
-ls
-ls /app/vendor
 #cp -r ruby $LIB_DIR
 
 echo -n "-----> Compile $LIB_NAME... "
@@ -89,6 +87,8 @@ cp libopaque.a $VENDOR_DIR/lib
 cp libopaque.so $VENDOR_DIR/lib
 cp opaque.h $VENDOR_DIR/include
 echo "done"
+
+ls $VENDOR_DIR/bin
 
 echo -n "-----> Configuring build environment... "
 export LD_LIBRARY_PATH="$VENDOR_DIR/lib:$LD_LIBRARY_PATH"
