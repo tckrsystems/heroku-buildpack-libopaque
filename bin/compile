@@ -59,24 +59,24 @@ fi
 ## Compile
 
 cd $CACHE_DIR
-echo -n "-----> Fetching $LIB_NAME... "
+echo "-----> Fetching $LIB_NAME... "
 git clone https://github.com/stef/libopaque.git
 echo "done"
 
-echo -n "-----> Update submodule $LIB_NAME... "
+echo "-----> Update submodule $LIB_NAME... "
 cd $LIB_NAME
 git submodule update --init --recursive --remote
 echo "done"
 
-echo -n "-----> Copy Ruby directory to lib... "
-cp -R /ruby $LIB_DIR
+echo "-----> Copy Ruby directory to lib... "
+cp -R ruby $LIB_DIR
 
-echo -n "-----> Compile $LIB_NAME... "
+echo "-----> Compile $LIB_NAME... "
 cd src
 make
 echo "done"
 
-echo -n "-----> Installing $LIB_NAME... "
+echo "-----> Installing $LIB_NAME... "
 mkdir -p $VENDOR_DIR/bin
 mkdir -p $VENDOR_DIR/lib
 mkdir -p $VENDOR_DIR/include
@@ -90,14 +90,14 @@ echo "done"
 #ls $VENDOR_DIR
 ls $LIB_DIR
 
-echo -n "-----> Configuring build environment... "
+echo "-----> Configuring build environment... "
 export LD_LIBRARY_PATH="$VENDOR_DIR/lib:$LD_LIBRARY_PATH"
 export LIBRARY_PATH="$VENDOR_DIR/lib:$LIBRARY_PATH"
 export CPPPATH="$VENDOR_DIR/include:$CPPPATH"
 export CPATH="$VENDOR_DIR/include:$CPATH"
 echo "done"
 
-echo -n "-----> Compile ruby binding... "
+echo "-----> Compile ruby binding... "
 ( cd ${BUILD_DIR}/${vendored_ruby_dir}/bin ; ./ruby $LIB_DIR/extconf.rb )
 ( cd $LIB_DIR ; make )
 
@@ -112,7 +112,7 @@ EOF
 
 echo "done"
 
-echo -n "-----> Building runtime environment... "
+echo "-----> Building runtime environment... "
 mkdir -p $BUILD_DIR/.profile.d
 
 cat <<EOF > $BUILD_DIR/.profile.d/libopaque.sh
@@ -124,7 +124,7 @@ EOF
 
 echo "done"
 
-echo -n "-----> Cleaning up $LIB_NAME... "
+echo "-----> Cleaning up $LIB_NAME... "
 cd $CACHE_DIR
 rm -r $LIB_NAME
 echo "done"
