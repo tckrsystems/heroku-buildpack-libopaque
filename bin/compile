@@ -77,6 +77,8 @@ echo "done"
 cp -r ../ruby $BUILD_DIR/lib/libopaque
 cd $BUILD_DIR/lib/libopaque
 ruby -v
+bundle update --ruby
+ruby -v
 ruby extconf.rb
 make CFLAGS="-fPIC"
 
