@@ -98,8 +98,10 @@ export CPATH="$VENDOR_DIR/include:$CPATH"
 echo "done"
 
 echo "-----> Compile ruby binding... "
-( cd ${BUILD_DIR}/${vendored_ruby_dir}/bin ; ./ruby $LIB_DIR/extconf.rb )
-( cd $LIB_DIR ; make )
+cd ${BUILD_DIR}/${vendored_ruby_dir}/bin
+./ruby $LIB_DIR/extconf.rb
+cd $LIB_DIR
+make
 
 cd $BASE_DIR
 
