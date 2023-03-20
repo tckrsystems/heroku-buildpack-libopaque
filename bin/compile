@@ -48,10 +48,7 @@ if ! command -v ruby &> /dev/null; then
     exit 1
   fi
 
-  mkdir -p "${BUILD_DIR}/.profile.d"
-  # Deliberately pick the same profile.d script filepath as the Ruby buildpack,
-  # so if the Ruby buildpack comes after this one, it will overwrite this script.
-  echo "export PATH=\"\${HOME}/${vendored_ruby_dir}/bin:\${PATH}\"" > "${BUILD_DIR}/.profile.d/ruby.sh"
+  export PATH="${BUILD_DIR}/${vendored_ruby_dir}/bin:$PATH"
 
   echo "Installed Ruby ${ruby_version}"
 fi
@@ -98,8 +95,7 @@ export CPATH="$VENDOR_DIR/include:$CPATH"
 echo "done"
 
 echo "-----> Compile ruby binding... "
-cd ${BUILD_DIR}/${vendored_ruby_dir}/bin
-./ruby $LIB_DIR/extconf.rb
+ruby $LIB_DIR/extconf.rb
 ls $LIB_DIR
 cd $LIB_DIR
 make
