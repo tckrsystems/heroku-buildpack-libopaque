@@ -38,6 +38,10 @@ export_env_dir() {
 }
 export_env_dir "$ENV_DIR"
 
+ruby -v
+bundle update --ruby
+ruby -v
+
 ### Compile
 
 cd $CACHE_DIR
@@ -76,9 +80,6 @@ echo "done"
 #echo -n "-----> Configuring Ruby binding... "
 cp -r ../ruby $BUILD_DIR/lib/libopaque
 cd $BUILD_DIR/lib/libopaque
-ruby -v
-bundle update --ruby
-ruby -v
 ruby extconf.rb
 make CFLAGS="-fPIC"
 
