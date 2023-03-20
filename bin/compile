@@ -89,6 +89,7 @@ cp opaque.h $VENDOR_DIR/include
 echo "done"
 
 ls $VENDOR_DIR
+ls $LIB_DIR
 
 echo -n "-----> Configuring build environment... "
 export LD_LIBRARY_PATH="$VENDOR_DIR/lib:$LD_LIBRARY_PATH"
