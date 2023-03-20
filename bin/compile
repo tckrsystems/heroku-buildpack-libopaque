@@ -88,7 +88,7 @@ cp libopaque.so $VENDOR_DIR/lib
 cp opaque.h $VENDOR_DIR/include
 echo "done"
 
-ls $VENDOR_DIR/bin
+ls $VENDOR_DIR
 
 echo -n "-----> Configuring build environment... "
 export LD_LIBRARY_PATH="$VENDOR_DIR/lib:$LD_LIBRARY_PATH"
