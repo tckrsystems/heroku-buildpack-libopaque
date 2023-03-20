@@ -7,20 +7,19 @@ set -eo pipefail
 
 ### Constants
 
-OPAQUE_DIR=libopaque
-TARBALL=$SODIUM_DIR.tar.gz
-TARBALL_URL=https://github.com/stef/libopaque/archive/refs/heads/master.zip
-
 ### Paths
 
 BASE_DIR=$PWD # absolute path
 BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
-INSTALL_DIR="$BUILD_DIR/vendor/libopaque"
+LIB_NAME=libopaque
+VENDOR_DIR="$BUILD_DIR/vendor/$LIB_NAME"
+LIB_DIR="$BUILD_DIR/lib/$LIB_NAME"
 
 mkdir -p $CACHE_DIR
-mkdir -p $INSTALL_DIR
+mkdir -p $VENDOR_DIR
+mkdir -p $LIB_DIR
 
 export_env_dir() {
   local env_dir=$1
@@ -38,10 +37,8 @@ export_env_dir() {
 }
 export_env_dir "$ENV_DIR"
 
-echo ${STACK}
-
-if ! command -v erb &> /dev/null; then
-  echo "-----> An existing Ruby installation was not found (required for erb template support)"
+if ! command -v ruby &> /dev/null; then
+  echo "-----> An existing Ruby installation was not found"
   ruby_version="3.2.1"
   ruby_url="https://heroku-buildpack-ruby.s3.us-east-1.amazonaws.com/${STACK}/ruby-${ruby_version}.tgz"
   vendored_ruby_dir=".heroku-buildpack-libopaque/ruby"
@@ -57,74 +54,81 @@ if ! command -v erb &> /dev/null; then
   # so if the Ruby buildpack comes after this one, it will overwrite this script.
   echo "export PATH=\"\${HOME}/${vendored_ruby_dir}/bin:\${PATH}\"" > "${BUILD_DIR}/.profile.d/ruby.sh"
 
-  echo "-----> nginx-buildpack: Installed Ruby ${ruby_version}"
+  echo "Installed Ruby ${ruby_version}"
 fi
 
 ls ${BUILD_DIR}/${vendored_ruby_dir}/bin
 ( cd ${BUILD_DIR}/${vendored_ruby_dir}/bin ; ./ruby -v )
 
-### Compile
-#
-#cd $CACHE_DIR
-#echo -n "-----> Fetching $OPAQUE_DIR... "
-#git clone https://github.com/stef/libopaque.git
-#echo "done"
-#
-#echo -n "-----> Update submodule $OPAQUE_DIR... "
-#cd $OPAQUE_DIR
-#git submodule update --init --recursive --remote
-#echo "done"
-#
-#echo -n "-----> Compile $OPAQUE_DIR... "
-#cd src
-#make
-#echo "done"
-#
-#echo -n "-----> Installing $OPAQUE_DIR... "
-#mkdir -p $INSTALL_DIR/bin
-#mkdir -p $INSTALL_DIR/lib
-#mkdir -p $INSTALL_DIR/include
-#
-#cp opaque.o $INSTALL_DIR/bin
-#cp libopaque.a $INSTALL_DIR/lib
-#cp libopaque.so $INSTALL_DIR/lib
-#cp opaque.h $INSTALL_DIR/include
-#echo "done"
-#
-#echo -n "-----> Configuring build environment... "
-#export LD_LIBRARY_PATH="$INSTALL_DIR/lib:$LD_LIBRARY_PATH"
-#export LIBRARY_PATH="$INSTALL_DIR/lib:$LIBRARY_PATH"
-#export CPPPATH="$INSTALL_DIR/include:$CPPPATH"
-#export CPATH="$INSTALL_DIR/include:$CPATH"
-#echo "done"
-#
-#cd $BASE_DIR
-#
-#cat <<EOF > export
-#export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:$LD_LIBRARY_PATH"
-#export LIBRARY_PATH="\$LIBRARY_PATH:$LIBRARY_PATH"
-#export CPPPATH="\$CPPPATH:$CPPPATH"
-#export CPATH="\$CPATH:$CPATH"
-#EOF
-#
-#echo "done"
-#
-#echo -n "-----> Building runtime environment... "
-#mkdir -p $BUILD_DIR/.profile.d
-#
-#cat <<EOF > $BUILD_DIR/.profile.d/libopaque.sh
-#export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:${LD_LIBRARY_PATH//$BUILD_DIR//app}"
-#export LIBRARY_PATH="\$LIBRARY_PATH:${LIBRARY_PATH//$BUILD_DIR//app}"
-#export CPPPATH="\$CPPPATH:${CPPPATH//$BUILD_DIR//app}"
-#export CPATH="\$CPATH:${CPATH//$BUILD_DIR//app}"
-#EOF
-#
-#echo "done"
-#
-#echo -n "-----> Cleaning up $OPAQUE_DIR... "
-#cd $CACHE_DIR
-#rm -r $OPAQUE_DIR
-#echo "done"
-#
-#echo "-----> libopaque installed"
+## Compile
+
+cd $CACHE_DIR
+echo -n "-----> Fetching $LIB_NAME... "
+git clone https://github.com/stef/libopaque.git
+echo "done"
+
+echo -n "-----> Update submodule $LIB_NAME... "
+cd $LIB_NAME
+git submodule update --init --recursive --remote
+echo "done"
+
+echo -n "-----> Copy Ruby directory to lib... "
+cp -p /ruby $LIB_DIR
+
+echo -n "-----> Compile $LIB_NAME... "
+cd src
+make
+echo "done"
+
+echo -n "-----> Installing $LIB_NAME... "
+mkdir -p $VENDOR_DIR/bin
+mkdir -p $VENDOR_DIR/lib
+mkdir -p $VENDOR_DIR/include
+
+cp opaque.o $VENDOR_DIR/bin
+cp libopaque.a $VENDOR_DIR/lib
+cp libopaque.so $VENDOR_DIR/lib
+cp opaque.h $VENDOR_DIR/include
+echo "done"
+
+echo -n "-----> Configuring build environment... "
+export LD_LIBRARY_PATH="$VENDOR_DIR/lib:$LD_LIBRARY_PATH"
+export LIBRARY_PATH="$VENDOR_DIR/lib:$LIBRARY_PATH"
+export CPPPATH="$VENDOR_DIR/include:$CPPPATH"
+export CPATH="$VENDOR_DIR/include:$CPATH"
+echo "done"
+
+echo -n "-----> Compile ruby binding... "
+( cd ${BUILD_DIR}/${vendored_ruby_dir}/bin ; ./ruby $LIB_DIR/extconf.rb )
+( cd $LIB_DIR ; make )
+
+cd $BASE_DIR
+
+cat <<EOF > export
+export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:$LD_LIBRARY_PATH"
+export LIBRARY_PATH="\$LIBRARY_PATH:$LIBRARY_PATH"
+export CPPPATH="\$CPPPATH:$CPPPATH"
+export CPATH="\$CPATH:$CPATH"
+EOF
+
+echo "done"
+
+echo -n "-----> Building runtime environment... "
+mkdir -p $BUILD_DIR/.profile.d
+
+cat <<EOF > $BUILD_DIR/.profile.d/libopaque.sh
+export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:${LD_LIBRARY_PATH//$BUILD_DIR//app}"
+export LIBRARY_PATH="\$LIBRARY_PATH:${LIBRARY_PATH//$BUILD_DIR//app}"
+export CPPPATH="\$CPPPATH:${CPPPATH//$BUILD_DIR//app}"
+export CPATH="\$CPATH:${CPATH//$BUILD_DIR//app}"
+EOF
+
+echo "done"
+
+echo -n "-----> Cleaning up $LIB_NAME... "
+cd $CACHE_DIR
+rm -r $LIB_NAME
+echo "done"
+
+echo "-----> libopaque installed"
 
