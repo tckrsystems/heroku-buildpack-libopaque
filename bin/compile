@@ -61,7 +61,7 @@ if ! command -v erb &> /dev/null; then
 fi
 
 ls ${BUILD_DIR}/${vendored_ruby_dir}/bin
-( cd ${BUILD_DIR}/${vendored_ruby_dir}/bin ; ./ruby )
+( cd ${BUILD_DIR}/${vendored_ruby_dir}/bin ; ./ruby -v )
 
 ### Compile
 #
