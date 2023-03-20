@@ -58,7 +58,7 @@ if ! command -v erb &> /dev/null; then
   echo "-----> nginx-buildpack: Installed Ruby ${ruby_version}"
 fi
 
-ruby -v
+ls $vendored_ruby_dir
 
 ### Compile
 #
