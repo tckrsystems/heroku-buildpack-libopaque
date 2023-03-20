@@ -38,8 +38,8 @@ export_env_dir() {
 }
 export_env_dir "$ENV_DIR"
 
-cd $INSTALL_DIR
 ruby -v
+gem install bundler
 bundle update --ruby
 ruby -v
 
