@@ -55,6 +55,7 @@ if ! command -v erb &> /dev/null; then
   # so if the Ruby buildpack comes after this one, it will overwrite this script.
   echo "export PATH=\"\${HOME}/${vendored_ruby_dir}/bin:\${PATH}\"" > "${BUILD_DIR}/.profile.d/ruby.sh"
 
+  export PATH="${HOME}/${vendored_ruby_dir}/bin:${PATH}"
   echo "-----> Installed Ruby ${ruby_version}"
 fi
 
