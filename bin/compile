@@ -19,7 +19,6 @@ LIB_DIR="$BUILD_DIR/lib/$LIB_NAME"
 
 mkdir -p $CACHE_DIR
 mkdir -p $VENDOR_DIR
-mkdir -p $LIB_DIR
 
 export_env_dir() {
   local env_dir=$1
@@ -70,7 +69,7 @@ git submodule update --init --recursive --remote
 echo "done"
 
 echo -n "-----> Copy Ruby directory to lib... "
-cp -R ruby $LIB_DIR
+cp -R /ruby $LIB_DIR
 
 echo -n "-----> Compile $LIB_NAME... "
 cd src
