@@ -74,7 +74,7 @@ echo "done"
 
 echo -n "-----> Copy Ruby directory to lib... "
 ls
-cp -p ruby $LIB_DIR
+cp -r ruby $LIB_DIR
 
 echo -n "-----> Compile $LIB_NAME... "
 cd src
