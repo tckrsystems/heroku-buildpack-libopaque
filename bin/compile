@@ -40,9 +40,9 @@ export_env_dir "$ENV_DIR"
 
 if ! command -v erb &> /dev/null; then
   echo "-----> An existing Ruby installation was not found (required for erb template support)"
-  ruby_version="3.1.2"
+  ruby_version="3.2.1"
   ruby_url="https://heroku-buildpack-ruby.s3.us-east-1.amazonaws.com/${STACK}/ruby-${ruby_version}.tgz"
-  vendored_ruby_dir=".heroku-buildpack-nginx/ruby"
+  vendored_ruby_dir=".heroku-buildpack-libopaque/ruby"
   mkdir -p "${BUILD_DIR}/${vendored_ruby_dir}"
 
   if ! curl --silent --show-error --fail --retry 3 --retry-connrefused --connect-timeout 5 "${ruby_url}" | tar -zxC "${BUILD_DIR}/${vendored_ruby_dir}"; then
@@ -59,67 +59,67 @@ if ! command -v erb &> /dev/null; then
 fi
 
 ### Compile
-
-cd $CACHE_DIR
-echo -n "-----> Fetching $OPAQUE_DIR... "
-git clone https://github.com/stef/libopaque.git
-echo "done"
-
-echo -n "-----> Update submodule $OPAQUE_DIR... "
-cd $OPAQUE_DIR
-git submodule update --init --recursive --remote
-echo "done"
-
-echo -n "-----> Compile $OPAQUE_DIR... "
-cd src
-make
-echo "done"
-
-echo -n "-----> Installing $OPAQUE_DIR... "
-mkdir -p $INSTALL_DIR/bin
-mkdir -p $INSTALL_DIR/lib
-mkdir -p $INSTALL_DIR/include
-
-cp opaque.o $INSTALL_DIR/bin
-cp libopaque.a $INSTALL_DIR/lib
-cp libopaque.so $INSTALL_DIR/lib
-cp opaque.h $INSTALL_DIR/include
-echo "done"
-
-echo -n "-----> Configuring build environment... "
-export LD_LIBRARY_PATH="$INSTALL_DIR/lib:$LD_LIBRARY_PATH"
-export LIBRARY_PATH="$INSTALL_DIR/lib:$LIBRARY_PATH"
-export CPPPATH="$INSTALL_DIR/include:$CPPPATH"
-export CPATH="$INSTALL_DIR/include:$CPATH"
-echo "done"
-
-cd $BASE_DIR
-
-cat <<EOF > export
-export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:$LD_LIBRARY_PATH"
-export LIBRARY_PATH="\$LIBRARY_PATH:$LIBRARY_PATH"
-export CPPPATH="\$CPPPATH:$CPPPATH"
-export CPATH="\$CPATH:$CPATH"
-EOF
-
-echo "done"
-
-echo -n "-----> Building runtime environment... "
-mkdir -p $BUILD_DIR/.profile.d
-
-cat <<EOF > $BUILD_DIR/.profile.d/libopaque.sh
-export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:${LD_LIBRARY_PATH//$BUILD_DIR//app}"
-export LIBRARY_PATH="\$LIBRARY_PATH:${LIBRARY_PATH//$BUILD_DIR//app}"
-export CPPPATH="\$CPPPATH:${CPPPATH//$BUILD_DIR//app}"
-export CPATH="\$CPATH:${CPATH//$BUILD_DIR//app}"
-EOF
-
-echo "done"
-
-echo -n "-----> Cleaning up $OPAQUE_DIR... "
-cd $CACHE_DIR
-rm -r $OPAQUE_DIR
-echo "done"
-
-echo "-----> libopaque installed"
+#
+#cd $CACHE_DIR
+#echo -n "-----> Fetching $OPAQUE_DIR... "
+#git clone https://github.com/stef/libopaque.git
+#echo "done"
+#
+#echo -n "-----> Update submodule $OPAQUE_DIR... "
+#cd $OPAQUE_DIR
+#git submodule update --init --recursive --remote
+#echo "done"
+#
+#echo -n "-----> Compile $OPAQUE_DIR... "
+#cd src
+#make
+#echo "done"
+#
+#echo -n "-----> Installing $OPAQUE_DIR... "
+#mkdir -p $INSTALL_DIR/bin
+#mkdir -p $INSTALL_DIR/lib
+#mkdir -p $INSTALL_DIR/include
+#
+#cp opaque.o $INSTALL_DIR/bin
+#cp libopaque.a $INSTALL_DIR/lib
+#cp libopaque.so $INSTALL_DIR/lib
+#cp opaque.h $INSTALL_DIR/include
+#echo "done"
+#
+#echo -n "-----> Configuring build environment... "
+#export LD_LIBRARY_PATH="$INSTALL_DIR/lib:$LD_LIBRARY_PATH"
+#export LIBRARY_PATH="$INSTALL_DIR/lib:$LIBRARY_PATH"
+#export CPPPATH="$INSTALL_DIR/include:$CPPPATH"
+#export CPATH="$INSTALL_DIR/include:$CPATH"
+#echo "done"
+#
+#cd $BASE_DIR
+#
+#cat <<EOF > export
+#export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:$LD_LIBRARY_PATH"
+#export LIBRARY_PATH="\$LIBRARY_PATH:$LIBRARY_PATH"
+#export CPPPATH="\$CPPPATH:$CPPPATH"
+#export CPATH="\$CPATH:$CPATH"
+#EOF
+#
+#echo "done"
+#
+#echo -n "-----> Building runtime environment... "
+#mkdir -p $BUILD_DIR/.profile.d
+#
+#cat <<EOF > $BUILD_DIR/.profile.d/libopaque.sh
+#export LD_LIBRARY_PATH="\$LD_LIBRARY_PATH:${LD_LIBRARY_PATH//$BUILD_DIR//app}"
+#export LIBRARY_PATH="\$LIBRARY_PATH:${LIBRARY_PATH//$BUILD_DIR//app}"
+#export CPPPATH="\$CPPPATH:${CPPPATH//$BUILD_DIR//app}"
+#export CPATH="\$CPATH:${CPATH//$BUILD_DIR//app}"
+#EOF
+#
+#echo "done"
+#
+#echo -n "-----> Cleaning up $OPAQUE_DIR... "
+#cd $CACHE_DIR
+#rm -r $OPAQUE_DIR
+#echo "done"
+#
+#echo "-----> libopaque installed"
 
