@@ -38,8 +38,6 @@ export_env_dir() {
 }
 export_env_dir "$ENV_DIR"
 
-ruby -v
-
 if ! command -v erb &> /dev/null; then
   echo "-----> An existing Ruby installation was not found (required for erb template support)"
   ruby_version="3.2.1"
