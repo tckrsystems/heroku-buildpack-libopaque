@@ -100,6 +100,7 @@ echo "done"
 echo "-----> Compile ruby binding... "
 cd ${BUILD_DIR}/${vendored_ruby_dir}/bin
 ./ruby $LIB_DIR/extconf.rb
+ls $LIB_DIR
 cd $LIB_DIR
 make
 
