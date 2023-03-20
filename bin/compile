@@ -40,9 +40,9 @@ export_env_dir "$ENV_DIR"
 
 if ! command -v erb &> /dev/null; then
   echo "-----> An existing Ruby installation was not found (required for erb template support)"
-  ruby_version="3.2.1"
+  ruby_version="3.1.2"
   ruby_url="https://heroku-buildpack-ruby.s3.us-east-1.amazonaws.com/${STACK}/ruby-${ruby_version}.tgz"
-  vendored_ruby_dir=".heroku-buildpack-libopaque/ruby"
+  vendored_ruby_dir=".heroku-buildpack-nginx/ruby"
   mkdir -p "${BUILD_DIR}/${vendored_ruby_dir}"
 
   if ! curl --silent --show-error --fail --retry 3 --retry-connrefused --connect-timeout 5 "${ruby_url}" | tar -zxC "${BUILD_DIR}/${vendored_ruby_dir}"; then
@@ -55,8 +55,7 @@ if ! command -v erb &> /dev/null; then
   # so if the Ruby buildpack comes after this one, it will overwrite this script.
   echo "export PATH=\"\${HOME}/${vendored_ruby_dir}/bin:\${PATH}\"" > "${BUILD_DIR}/.profile.d/ruby.sh"
 
-  export PATH="${HOME}/${vendored_ruby_dir}/bin:${PATH}"
-  echo "-----> Installed Ruby ${ruby_version}"
+  echo "-----> nginx-buildpack: Installed Ruby ${ruby_version}"
 fi
 
 ### Compile
@@ -93,12 +92,6 @@ export LIBRARY_PATH="$INSTALL_DIR/lib:$LIBRARY_PATH"
 export CPPPATH="$INSTALL_DIR/include:$CPPPATH"
 export CPATH="$INSTALL_DIR/include:$CPATH"
 echo "done"
-
-echo -n "-----> Configuring Ruby binding... "
-cp -r ../ruby $BUILD_DIR/lib/libopaque
-cd $BUILD_DIR/lib/libopaque
-ruby extconf.rb
-make CFLAGS="-fPIC"
 
 cd $BASE_DIR
 
