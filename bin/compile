@@ -57,9 +57,6 @@ if ! command -v ruby &> /dev/null; then
   echo "Installed Ruby ${ruby_version}"
 fi
 
-ls ${BUILD_DIR}/${vendored_ruby_dir}/bin
-( cd ${BUILD_DIR}/${vendored_ruby_dir}/bin ; ./ruby -v )
-
 ## Compile
 
 cd $CACHE_DIR
@@ -73,7 +70,7 @@ git submodule update --init --recursive --remote
 echo "done"
 
 echo -n "-----> Copy Ruby directory to lib... "
-ls
+ls $LIB_DIR
 cp -r ruby $LIB_DIR
 
 echo -n "-----> Compile $LIB_NAME... "
