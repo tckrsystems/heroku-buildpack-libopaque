@@ -95,9 +95,9 @@ export CPATH="$VENDOR_DIR/include:$CPATH"
 echo "done"
 
 echo "-----> Compile ruby binding... "
-ruby $LIB_DIR/extconf.rb
-ls $LIB_DIR
 cd $LIB_DIR
+ruby extconf.rb
+ls $LIB_DIR
 make
 
 cd $BASE_DIR
