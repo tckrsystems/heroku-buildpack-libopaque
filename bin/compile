@@ -43,7 +43,7 @@ if ! command -v erb &> /dev/null; then
   ruby_version="3.2.1"
   ruby_url="https://heroku-buildpack-ruby.s3.us-east-1.amazonaws.com/${STACK}/ruby-${ruby_version}.tgz"
   vendored_ruby_dir=".heroku-buildpack-libopaque/ruby"
-  mkdir -p "${BUILD_DIR}/${vendored_ruby_dir}"
+  mkdir -p "${BUILD_DIR}/${vendored_ruby_dir}/bin"
 
   if ! curl --silent --show-error --fail --retry 3 --retry-connrefused --connect-timeout 5 "${ruby_url}" | tar -zxC "${BUILD_DIR}/${vendored_ruby_dir}"; then
     echo "     ! Failed to download Ruby from '${ruby_url}'" >&2
