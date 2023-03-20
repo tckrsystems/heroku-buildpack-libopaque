@@ -39,7 +39,7 @@ export_env_dir() {
 export_env_dir "$ENV_DIR"
 
 ruby -v
-cd ~
+cd /app
 ls
 gem install bundler
 bundle update --ruby
